@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dhruv Nivatia — ML Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16191d;
+    --ink-soft:#4a5158;
+    --line:#e3e0d8;
+    --paper:#fafaf7;
+    --paper-2:#f2f1ea;
+    --pulse:#0f6e5c;
+    --pulse-soft:#e4f0ec;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:0 28px;position:relative;z-index:2}
+
+  /* ============ ANIMATED BACKGROUND LAYER ============ */
+  .bg-fx{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    overflow:hidden;
+  }
+  /* scrolling ECG strips across the whole page */
+  .ecg-band{
+    position:absolute;left:0;width:200%;height:120px;opacity:.10;
+  }
+  .ecg-band svg{width:50%;height:100%;float:left}
+  .ecg-band path{fill:none;stroke:var(--pulse);stroke-width:2}
+  .ecg-band.b1{top:14%;animation:scrollL 14s linear infinite}
+  .ecg-band.b2{top:44%;animation:scrollL 22s linear infinite;opacity:.07}
+  .ecg-band.b3{top:74%;animation:scrollL 18s linear infinite;opacity:.08}
+  @keyframes scrollL{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* drifting pulse rings */
+  .ring{
+    position:absolute;border:1.5px solid var(--pulse);border-radius:50%;
+    opacity:0;
+  }
+  .ring.r1{left:8%;top:30%;width:60px;height:60px;animation:ripple 5s ease-out infinite}
+  .ring.r2{right:12%;top:62%;width:80px;height:80px;animation:ripple 6.5s ease-out .8s infinite}
+  .ring.r3{left:18%;bottom:12%;width:50px;height:50px;animation:ripple 5.8s ease-out 1.6s infinite}
+  @keyframes ripple{
+    0%{transform:scale(.3);opacity:.5}
+    100%{transform:scale(2.6);opacity:0}
+  }
+
+  /* floating data dots */
+  .dot{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--pulse);opacity:.25}
+  .dot.d1{left:24%;top:20%;animation:float1 9s ease-in-out infinite}
+  .dot.d2{right:20%;top:35%;animation:float2 11s ease-in-out infinite}
+  .dot.d3{left:40%;bottom:24%;animation:float1 8s ease-in-out infinite reverse}
+  .dot.d4{right:30%;bottom:30%;animation:float2 13s ease-in-out infinite}
+  @keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px)}}
+  @keyframes float2{0%,100%{transform:translateY(0)}50%{transform:translateY(28px)}}
+
+  @media(prefers-reduced-motion:reduce){
+    .bg-fx *{animation:none !important}
+  }
+
+  a{color:inherit}
+
+  /* ---- nav ---- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(250,250,247,.82);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .logo{font-family:'Fraunces',serif;font-weight:600;font-size:1.15rem;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+  .logo .mini-heart{display:inline-block;color:var(--pulse);animation:beat 1.1s ease-in-out infinite}
+  @keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.25)}30%{transform:scale(1)}45%{transform:scale(1.15)}}
+  .navlinks{display:flex;gap:26px;font-size:.86rem;font-weight:500}
+  .navlinks a{color:var(--ink-soft);text-decoration:none;transition:color .2s}
+  .navlinks a:hover{color:var(--pulse)}
+  @media(max-width:640px){.navlinks{display:none}}
+
+  /* ---- hero ---- */
+  header{padding:84px 0 56px;border-bottom:1px solid var(--line);position:relative}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--pulse);margin-bottom:22px;
+  }
+  h1{
+    font-family:'Fraunces',serif;font-weight:500;
+    font-size:clamp(2.6rem,6vw,4.2rem);
+    line-height:1.04;letter-spacing:-.02em;margin-bottom:24px;
+  }
+  h1 em{font-style:italic;color:var(--pulse)}
+  .lede{font-size:1.18rem;color:var(--ink-soft);max-width:620px;margin-bottom:34px}
+  .meta{display:flex;flex-wrap:wrap;gap:10px}
+  .chip{
+    font-size:.82rem;font-weight:500;
+    border:1px solid var(--line);border-radius:100px;
+    padding:7px 15px;color:var(--ink-soft);
+    text-decoration:none;transition:all .2s;background:#fff;
+  }
+  .chip:hover{border-color:var(--pulse);color:var(--pulse)}
+
+  /* ---- live vitals panel in hero ---- */
+  .vitals{
+    margin-top:42px;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+  }
+  @media(max-width:760px){.vitals{grid-template-columns:1fr 1fr}}
+  .vital{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 16px 12px;position:relative;overflow:hidden;
+  }
+  .vital-label{
+    font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;display:flex;
+    justify-content:space-between;align-items:center;
+  }
+  .vital-label b{color:var(--pulse);font-weight:600}
+  .vital svg{width:100%;height:42px;display:block}
+  .vital svg path,.vital svg polyline{fill:none;stroke:var(--pulse);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ECG trace draw + loop */
+  .trace{stroke-dasharray:600;stroke-dashoffset:600;animation:draw 2.4s linear infinite}
+  @keyframes draw{0%{stroke-dashoffset:600}60%{stroke-dashoffset:0}100%{stroke-dashoffset:-600}}
+
+  /* beating heart */
+  .heart-wrap{display:flex;align-items:center;justify-content:center;height:42px}
+  .heart{fill:var(--pulse);animation:beat 1.05s ease-in-out infinite;transform-origin:center}
+
+  /* pulse wave (PPG) smooth */
+  .ppg{animation:ppgmove 3s linear infinite}
+  @keyframes ppgmove{from{transform:translateX(0)}to{transform:translateX(-80px)}}
+
+  /* respiration / BCG bed movement */
+  .breathe{animation:breathe 4s ease-in-out infinite;transform-origin:center}
+  @keyframes breathe{0%,100%{transform:scaleY(.7) translateY(4px)}50%{transform:scaleY(1.15) translateY(-3px)}}
+  .bed-body{animation:bedrise 4s ease-in-out infinite;transform-origin:center}
+  @keyframes bedrise{0%,100%{transform:translateY(2px)}50%{transform:translateY(-3px)}}
+
+  /* ---- section scaffold ---- */
+  section{padding:68px 0;border-bottom:1px solid var(--line);position:relative;z-index:2}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:40px}
+  .sec-num{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--pulse);padding-top:6px}
+  .sec-title{font-family:'Fraunces',serif;font-weight:500;font-size:1.9rem;letter-spacing:-.01em}
+  p.body{color:var(--ink-soft);max-width:680px;font-size:1.04rem}
+
+  /* give content sections a translucent paper backing so bg fx stays subtle behind text */
+  section, header, footer{background:rgba(250,250,247,.72);backdrop-filter:blur(2px)}
+
+  /* ---- experience ---- */
+  .job{display:grid;grid-template-columns:170px 1fr;gap:24px;padding:24px 0;border-top:1px solid var(--line)}
+  .job:first-of-type{border-top:none;padding-top:0}
+  .job-when{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--ink-soft);line-height:1.7}
+  .job-role{font-weight:600;font-size:1.06rem;margin-bottom:2px}
+  .job-co{color:var(--pulse);font-weight:500;font-size:.92rem;margin-bottom:12px}
+  .job ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+  .job li{position:relative;padding-left:18px;color:var(--ink-soft);font-size:.96rem}
+  .job li::before{content:"";position:absolute;left:0;top:.7em;width:5px;height:5px;border-radius:50%;background:var(--pulse)}
+  @media(max-width:640px){.job{grid-template-columns:1fr;gap:10px}}
+
+  /* ---- projects ---- */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .card{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px;display:flex;flex-direction:column;gap:10px;
+    transition:transform .25s,box-shadow .25s,border-color .25s;
+    opacity:0;transform:translateY(24px);
+  }
+  .card.in{opacity:1;transform:translateY(0)}
+  .card:hover{transform:translateY(-4px);box-shadow:0 14px 30px -18px rgba(16,25,29,.45);border-color:#d3cfc4}
+  .card-tag{
+    font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--pulse);
+  }
+  .card h3{font-size:1.08rem;font-weight:600;letter-spacing:-.01em;line-height:1.3}
+  .card p{font-size:.92rem;color:var(--ink-soft)}
+  .badge{
+    align-self:flex-start;margin-top:auto;
+    background:var(--pulse-soft);color:var(--pulse);
+    font-size:.74rem;font-weight:600;padding:4px 11px;border-radius:100px;
+  }
+
+  /* ---- credentials ---- */
+  .cred{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:640px){.cred{grid-template-columns:1fr}}
+  .cred-box{border:1px solid var(--line);border-radius:var(--radius);padding:24px;background:var(--paper-2)}
+  .cred-kind{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--pulse);margin-bottom:12px}
+  .cred-box h3{font-family:'Fraunces',serif;font-weight:500;font-size:1.18rem;line-height:1.3;margin-bottom:8px}
+  .cred-box p{font-size:.9rem;color:var(--ink-soft)}
+  .cred-box span{display:block;margin-top:10px;font-size:.82rem;color:var(--ink-soft);font-style:italic}
+
+  /* ---- skills ---- */
+  .skillset{display:flex;flex-direction:column;gap:22px}
+  .skillrow{display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:start}
+  .skillrow h4{font-weight:600;font-size:.98rem}
+  .tags{display:flex;flex-wrap:wrap;gap:8px}
+  .tag{font-size:.82rem;background:#fff;border:1px solid var(--line);border-radius:7px;padding:5px 11px;color:var(--ink-soft)}
+  @media(max-width:640px){.skillrow{grid-template-columns:1fr;gap:8px}}
+
+  /* ---- footer ---- */
+  footer{padding:72px 0 60px;text-align:center}
+  footer h2{font-family:'Fraunces',serif;font-weight:500;font-size:2.1rem;margin-bottom:14px;letter-spacing:-.01em}
+  footer p{color:var(--ink-soft);margin-bottom:28px}
+  .foot-links{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .foot-links a{
+    text-decoration:none;font-weight:500;font-size:.92rem;
+    border:1px solid var(--line);border-radius:100px;padding:11px 22px;
+    transition:all .2s;background:#fff;
+  }
+  .foot-links a.primary{background:var(--pulse);color:#fff;border-color:var(--pulse)}
+  .foot-links a:hover{border-color:var(--pulse);color:var(--pulse)}
+  .foot-links a.primary:hover{background:#0c5a4b;color:#fff}
+  .copyright{margin-top:46px;font-size:.78rem;color:#9a978d;font-family:'JetBrains Mono',monospace}
+</style>
+</head>
+<body>
+
+<!-- ============ ANIMATED BACKGROUND ============ -->
+<div class="bg-fx" aria-hidden="true">
+  <div class="ecg-band b1">
+    <svg viewBox="0 0 600 120" preserveAspectRatio="none"><path d="M0,60 L80,60 L92,60 L100,40 L110,90 L122,18 L134,96 L148,60 L240,60 L252,60 L262,48 L274,74 L286,60 L380,60 L392,60 L400,40 L410,90 L422,18 L434,96 L448,60 L540,60 L600,60"/></svg>
+    <svg viewBox="0 0 600 120" preserveAspectRatio="none"><path d="M0,60 L80,60 L92,60 L100,40 L110,90 L122,18 L134,96 L148,60 L240,60 L252,60 L262,48 L274,74 L286,60 L380,60 L392,60 L400,40 L410,90 L422,18 L434,96 L448,60 L540,60 L600,60"/></svg>
+  </div>
+  <div class="ecg-band b2">
+    <svg viewBox="0 0 600 120" preserveAspectRatio="none"><path d="M0,60 Q60,20 120,60 T240,60 T360,60 T480,60 T600,60"/></svg>
+    <svg viewBox="0 0 600 120" preserveAspectRatio="none"><path d="M0,60 Q60,20 120,60 T240,60 T360,60 T480,60 T600,60"/></svg>
+  </div>
+  <div class="ecg-band b3">
+    <svg viewBox="0 0 600 120" preserveAspectRatio="none"><path d="M0,60 L100,60 L120,30 L140,60 L160,60 L180,85 L200,60 L320,60 L340,30 L360,60 L380,60 L400,85 L420,60 L540,60 L600,60"/></svg>
+    <svg viewBox="0 0 600 120" preserveAspectRatio="none"><path d="M0,60 L100,60 L120,30 L140,60 L160,60 L180,85 L200,60 L320,60 L340,30 L360,60 L380,60 L400,85 L420,60 L540,60 L600,60"/></svg>
+  </div>
+  <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span>
+  <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="dot d4"></span>
+</div>
+
+<nav>
+  <div class="wrap">
+    <span class="logo"><span class="mini-heart">♥</span>Dhruv Nivatia</span>
+    <div class="navlinks">
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#work">Work</a>
+      <a href="#credentials">Patent &amp; Paper</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">ML Engineer · Biomedical Signal Processing</div>
+    <h1>I turn physiological<br>signals into <em>shipped</em> products.</h1>
+    <p class="lede">Machine learning engineer specializing in wearable health AI — ECG, PPG, BCG, and ICG signals translated into algorithms running on devices in millions of hands and wrists.</p>
+    <div class="meta">
+      <a class="chip" href="mailto:dhruvn536@gmail.com">dhruvn536@gmail.com</a>
+      <a class="chip" href="tel:+918728068766">+91 8728068766</a>
+      <a class="chip" href="https://www.linkedin.com/in/dhruv-nivatia" target="_blank" rel="noopener">LinkedIn ↗</a>
+      <span class="chip">Noida, India</span>
+    </div>
+
+    <!-- LIVE VITALS PANEL -->
+    <div class="vitals">
+      <div class="vital">
+        <div class="vital-label"><span>ECG</span><b>72 bpm</b></div>
+        <svg viewBox="0 0 300 42" preserveAspectRatio="none">
+          <path class="trace" d="M0,21 L60,21 L70,21 L78,8 L86,34 L96,2 L106,38 L116,21 L180,21 L190,21 L198,14 L208,28 L218,21 L300,21"/>
+        </svg>
+      </div>
+      <div class="vital">
+        <div class="vital-label"><span>Pulse</span><b>PPG</b></div>
+        <svg viewBox="0 0 300 42" preserveAspectRatio="none">
+          <path class="ppg" d="M-80,30 Q-60,6 -40,30 T0,30 Q20,6 40,30 T80,30 Q100,6 120,30 T160,30 Q180,6 200,30 T240,30 Q260,6 280,30 T320,30 Q340,6 360,30 T400,30"/>
+        </svg>
+      </div>
+      <div class="vital">
+        <div class="vital-label"><span>Heart</span><b>♥ active</b></div>
+        <div class="heart-wrap">
+          <svg width="34" height="30" viewBox="0 0 32 28"><path class="heart" d="M16,28 C16,28 2,18 2,9 C2,4 6,1 10,1 C13,1 15,3 16,5 C17,3 19,1 22,1 C26,1 30,4 30,9 C30,18 16,28 16,28 Z"/></svg>
+        </div>
+      </div>
+      <div class="vital">
+        <div class="vital-label"><span>BCG</span><b>respiration</b></div>
+        <svg viewBox="0 0 80 42" preserveAspectRatio="xMidYMid meet">
+          <!-- simple bed + breathing body -->
+          <line x1="6" y1="34" x2="74" y2="34" stroke="var(--ink-soft)" stroke-width="1.5" opacity=".5"/>
+          <ellipse class="bed-body" cx="40" cy="26" rx="22" ry="7" fill="var(--pulse-soft)" stroke="var(--pulse)" stroke-width="1.5"/>
+          <circle class="breathe" cx="40" cy="20" r="5" fill="var(--pulse)" opacity=".8"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="about">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">01</span><h2 class="sec-title">About</h2></div>
+    <p class="body">I build ML and deep learning systems for physiological signals — the kind that have to work reliably on-device, in real time, under real-world noise. My background spans Samsung R&amp;D, where I shipped commercialized algorithms to the Galaxy Watch, and HealthTech startups building next-generation cardiac and sleep monitoring. Along the way I've earned a patent in glycemic anomaly detection and contributed to peer-reviewed research. My core strength is the full path: from raw sensor stream to validated, deployed model.</p>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">02</span><h2 class="sec-title">Experience</h2></div>
+
+    <div class="job">
+      <div class="job-when">Aug 2025 — Present<br>Bangalore</div>
+      <div>
+        <div class="job-role">Machine Learning Scientist</div>
+        <div class="job-co">HealthTech Startup</div>
+        <ul>
+          <li>ECG, PPG, BCG, and ICG–based ML/DL pipelines for heart rate, HRV, cardiac-volume, and sleep-stage estimation.</li>
+          <li>Activity-recognition models from IMU sensors using LSTMs and CNN-RNN hybrid architectures.</li>
+          <li>Designed and optimized algorithms for next-generation wearable health monitoring.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-when">Jul 2022 — Aug 2025<br>Noida</div>
+      <div>
+        <div class="job-role">Machine Learning Engineer</div>
+        <div class="job-co">Samsung R&amp;D</div>
+        <ul>
+          <li>End-to-end design and deployment of health-focused ML/DL models, including snore detection and blood-glucose prediction from multimodal wearable sensors.</li>
+          <li>Developed and commercialized the cycling-detection algorithm for Samsung Galaxy Watch 6 with optimized on-device, real-time activity recognition.</li>
+          <li>Contributed to patents and research publications in applied AI for health and fitness.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-when">Jul 2020 — Jan 2022<br>Noida</div>
+      <div>
+        <div class="job-role">Machine Learning Freelancer</div>
+        <div class="job-co">Fiverr</div>
+        <ul>
+          <li>Delivered ML/DL solutions across classification, object detection, and NLP for diverse clients.</li>
+          <li>Deployed and optimized models in TensorFlow and PyTorch with hands-on feature engineering.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">03</span><h2 class="sec-title">Featured work</h2></div>
+    <div class="grid">
+
+      <div class="card">
+        <span class="card-tag">BCG · Cardiac</span>
+        <h3>Bed-based BCG heart rate &amp; HRV</h3>
+        <p>Contactless heart-rate and HRV estimation from ballistocardiogram signals on a bed-based system.</p>
+        <span class="badge">95% accurate with Polar reference</span>
+      </div>
+
+      <div class="card">
+        <span class="card-tag">BCG · Sleep</span>
+        <h3>Bed-based sleep staging</h3>
+        <p>Sleep-stage classification from BCG signals, enabling unobtrusive overnight monitoring without wearables.</p>
+        <span class="badge">Deployed</span>
+      </div>
+
+      <div class="card">
+        <span class="card-tag">Audio + BCG</span>
+        <h3>Snore detection</h3>
+        <p>Multimodal snore detection fusing audio and BCG from a bed-based sensing system.</p>
+        <span class="badge">Multimodal</span>
+      </div>
+
+      <div class="card">
+        <span class="card-tag">PPG · ECG</span>
+        <h3>HR &amp; HRV from PPG/ECG</h3>
+        <p>Heart-rate and HRV pipelines built on PPG and ECG data for multiple HealthTech startups.</p>
+        <span class="badge">Multi-client</span>
+      </div>
+
+      <div class="card">
+        <span class="card-tag">Wearable · Samsung</span>
+        <h3>Glucose &amp; blood-pressure prediction</h3>
+        <p>Blood-glucose and blood-pressure prediction models shipped for the Samsung Galaxy Watch.</p>
+        <span class="badge">Shipped to product</span>
+      </div>
+
+      <div class="card">
+        <span class="card-tag">Wearable · Samsung</span>
+        <h3>Cycling detection — Watch 6</h3>
+        <p>Real-time cycling detection from accelerometer and gyroscope data, running on-device for millions of users.</p>
+        <span class="badge">Shipped to product</span>
+      </div>
+
+      <div class="card">
+        <span class="card-tag">IMU · Activity</span>
+        <h3>Activity recognition</h3>
+        <p>Activity-recognition models for Galaxy Watches and a range of startup wearables across motion-sensor data.</p>
+        <span class="badge">Cross-device</span>
+      </div>
+
+      <div class="card">
+        <span class="card-tag">ICG · Cardiac</span>
+        <h3>Cardiac parameters from ICG</h3>
+        <p>Shipped cardiac output, stroke volume, PEP, and ejection-time estimation from impedance cardiography data.</p>
+        <span class="badge">Shipped</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="credentials">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">04</span><h2 class="sec-title">Patent &amp; publication</h2></div>
+    <div class="cred">
+      <div class="cred-box">
+        <div class="cred-kind">Patent · Samsung</div>
+        <h3>Method to Analyze Anomalous Fluctuation of Glycemic in User</h3>
+        <p>A method to detect and analyze anomalous glycemic fluctuations in users, strengthening predictive healthcare analytics.</p>
+        <span>Organization: Samsung</span>
+      </div>
+      <div class="cred-box">
+        <div class="cred-kind">Publication · 2022</div>
+        <h3>A Machine Learning Approach for Predicting the Nucleophilicity of Organic Molecules</h3>
+        <p>Peer-reviewed research applying ML to chemical reactivity prediction.</p>
+        <span>Saini, Sharma &amp; Nivatia (2022)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">05</span><h2 class="sec-title">Expertise</h2></div>
+    <div class="skillset">
+      <div class="skillrow">
+        <h4>Biomedical signals</h4>
+        <div class="tags">
+          <span class="tag">ECG</span><span class="tag">PPG</span><span class="tag">BCG</span><span class="tag">ICG</span>
+          <span class="tag">HR / HRV</span><span class="tag">Sleep staging</span><span class="tag">Feature extraction</span>
+        </div>
+      </div>
+      <div class="skillrow">
+        <h4>Time-series &amp; sensors</h4>
+        <div class="tags">
+          <span class="tag">IMU / accelerometer</span><span class="tag">Activity recognition</span>
+          <span class="tag">Anomaly detection</span><span class="tag">Real-time on-device ML</span>
+        </div>
+      </div>
+      <div class="skillrow">
+        <h4>Deep learning</h4>
+        <div class="tags">
+          <span class="tag">LSTM</span><span class="tag">CNN-RNN</span><span class="tag">Transformers</span>
+          <span class="tag">TensorFlow</span><span class="tag">PyTorch</span>
+        </div>
+      </div>
+      <div class="skillrow">
+        <h4>Cloud &amp; MLOps</h4>
+        <div class="tags">
+          <span class="tag">AWS</span><span class="tag">Spark</span><span class="tag">Docker</span><span class="tag">CI/CD for ML</span>
+        </div>
+      </div>
+      <div class="skillrow">
+        <h4>NLP &amp; GenAI <span style="font-weight:400;color:#9a978d">· side work</span></h4>
+        <div class="tags">
+          <span class="tag">LLMs</span><span class="tag">RAG</span><span class="tag">LangChain</span><span class="tag">FAISS</span>
+        </div>
+      </div>
+      <div class="skillrow">
+        <h4>Education</h4>
+        <div class="tags">
+          <span class="tag">B.Tech, Information Technology — Panjab University (2018–2022)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <h2>Let's build something measurable.</h2>
+    <p>Open to ML engineering roles in wearable health, biosignals, and applied AI.</p>
+    <div class="foot-links">
+      <a class="primary" href="mailto:dhruvn536@gmail.com">Email me</a>
+      <a href="https://www.linkedin.com/in/dhruv-nivatia" target="_blank" rel="noopener">LinkedIn ↗</a>
+      <a href="tel:+918728068766">Call</a>
+    </div>
+    <div class="copyright">© 2026 Dhruv Nivatia · Noida, India</div>
+  </div>
+</footer>
+
+<script>
+  // scroll-reveal for project cards
+  const cards = document.querySelectorAll('.card');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('in'), (i % 2) * 90);
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    cards.forEach(c => io.observe(c));
+  } else {
+    cards.forEach(c => c.classList.add('in'));
+  }
+</script>
+
+</body>
+</html>
